@@ -5,6 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/helper"
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 	"github.com/jjmrocha/knowledge-mcp/internal/uri"
 )
 
@@ -12,7 +14,7 @@ func TestParse_ValidPatterns(t *testing.T) {
 	tests := []struct {
 		name           string
 		uri            string
-		expectedEntity uri.EntityType
+		expectedEntity string
 		expectedCtx    *string
 		expectedDomain *string
 		expectedSlug   string
@@ -20,60 +22,60 @@ func TestParse_ValidPatterns(t *testing.T) {
 		{
 			name:           "global tag",
 			uri:            "scio://tags/business-rule",
-			expectedEntity: uri.EntityTypeTag,
+			expectedEntity: model.EntityTypeTag,
 			expectedSlug:   "business-rule",
 		},
 		{
 			name:           "context-scoped tag",
 			uri:            "scio://contexts/ecommerce/tags/local-tag",
-			expectedEntity: uri.EntityTypeTag,
-			expectedCtx:    new("ecommerce"),
+			expectedEntity: model.EntityTypeTag,
+			expectedCtx:    helper.ToPointer("ecommerce"),
 			expectedSlug:   "local-tag",
 		},
 		{
 			name:           "global relation",
 			uri:            "scio://relations/implements",
-			expectedEntity: uri.EntityTypeRelation,
+			expectedEntity: model.EntityTypeRelation,
 			expectedSlug:   "implements",
 		},
 		{
 			name:           "context-scoped relation",
 			uri:            "scio://contexts/ecommerce/relations/owns",
-			expectedEntity: uri.EntityTypeRelation,
-			expectedCtx:    new("ecommerce"),
+			expectedEntity: model.EntityTypeRelation,
+			expectedCtx:    helper.ToPointer("ecommerce"),
 			expectedSlug:   "owns",
 		},
 		{
 			name:           "context",
 			uri:            "scio://contexts/ecommerce",
-			expectedEntity: uri.EntityTypeContext,
+			expectedEntity: model.EntityTypeContext,
 			expectedSlug:   "ecommerce",
 		},
 		{
 			name:           "domain",
 			uri:            "scio://contexts/ecommerce/domains/business-rules",
-			expectedEntity: uri.EntityTypeDomain,
-			expectedCtx:    new("ecommerce"),
+			expectedEntity: model.EntityTypeDomain,
+			expectedCtx:    helper.ToPointer("ecommerce"),
 			expectedSlug:   "business-rules",
 		},
 		{
 			name:           "concept",
 			uri:            "scio://contexts/ecommerce/domains/business-rules/concepts/discount-calculation",
-			expectedEntity: uri.EntityTypeConcept,
-			expectedCtx:    new("ecommerce"),
-			expectedDomain: new("business-rules"),
+			expectedEntity: model.EntityTypeConcept,
+			expectedCtx:    helper.ToPointer("ecommerce"),
+			expectedDomain: helper.ToPointer("business-rules"),
 			expectedSlug:   "discount-calculation",
 		},
 		{
 			name:           "single-char slug",
 			uri:            "scio://tags/a",
-			expectedEntity: uri.EntityTypeTag,
+			expectedEntity: model.EntityTypeTag,
 			expectedSlug:   "a",
 		},
 		{
 			name:           "slug with digits",
 			uri:            "scio://tags/rule-v2",
-			expectedEntity: uri.EntityTypeTag,
+			expectedEntity: model.EntityTypeTag,
 			expectedSlug:   "rule-v2",
 		},
 	}

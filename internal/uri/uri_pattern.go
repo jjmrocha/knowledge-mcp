@@ -1,20 +1,14 @@
 package uri
 
-import "regexp"
+import (
+	"regexp"
 
-type EntityType string
-
-const (
-	EntityTypeTag      EntityType = "tag"
-	EntityTypeRelation EntityType = "relation"
-	EntityTypeContext  EntityType = "context"
-	EntityTypeDomain   EntityType = "domain"
-	EntityTypeConcept  EntityType = "concept"
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type uriPattern struct {
 	re         *regexp.Regexp
-	entityType EntityType
+	entityType string
 	hasContext bool
 	hasDomain  bool
 }
@@ -22,35 +16,35 @@ type uriPattern struct {
 var uriPatterns = []uriPattern{
 	{
 		re:         regexp.MustCompile(`^scio://tags/([a-z0-9-]+)$`),
-		entityType: EntityTypeTag,
+		entityType: model.EntityTypeTag,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://contexts/([a-z0-9-]+)/tags/([a-z0-9-]+)$`),
-		entityType: EntityTypeTag,
+		entityType: model.EntityTypeTag,
 		hasContext: true,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://relations/([a-z0-9-]+)$`),
-		entityType: EntityTypeRelation,
+		entityType: model.EntityTypeRelation,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://contexts/([a-z0-9-]+)/relations/([a-z0-9-]+)$`),
-		entityType: EntityTypeRelation,
+		entityType: model.EntityTypeRelation,
 		hasContext: true,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://contexts/([a-z0-9-]+)/domains/([a-z0-9-]+)/concepts/([a-z0-9-]+)$`),
-		entityType: EntityTypeConcept,
+		entityType: model.EntityTypeConcept,
 		hasContext: true,
 		hasDomain:  true,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://contexts/([a-z0-9-]+)/domains/([a-z0-9-]+)$`),
-		entityType: EntityTypeDomain,
+		entityType: model.EntityTypeDomain,
 		hasContext: true,
 	},
 	{
 		re:         regexp.MustCompile(`^scio://contexts/([a-z0-9-]+)$`),
-		entityType: EntityTypeContext,
+		entityType: model.EntityTypeContext,
 	},
 }

@@ -1,6 +1,6 @@
 module github.com/jjmrocha/knowledge-mcp
 
-go 1.26
+go 1.25.7
 
 require (
 	github.com/modelcontextprotocol/go-sdk v1.3.1

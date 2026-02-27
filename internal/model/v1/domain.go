@@ -1,0 +1,66 @@
+package v1
+
+import (
+	"fmt"
+	"time"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
+)
+
+type Domain struct {
+	Entity     string        `yaml:"entity"`
+	Schema     int           `yaml:"schema"`
+	URI        string        `yaml:"uri"`
+	Name       string        `yaml:"name"`
+	Version    int           `yaml:"version"`
+	Created    time.Time     `yaml:"created"`
+	LastUpdate time.Time     `yaml:"last-update"`
+	Tags       []string      `yaml:"tags"`
+	Relations  []RelationRef `yaml:"relations"`
+	Body       string        `yaml:"-"`
+}
+
+func ParseDomain(content string) (*Domain, error) {
+	entityFile, err := model.ParseEntityFile(content)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse domain file: %w", err)
+	}
+
+	var d Domain
+	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &d); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal domain metadata: %w", err)
+	}
+
+	if d.Entity != model.EntityTypeDomain {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeDomain, d.Entity)
+	}
+
+	d.Body = entityFile.Body
+	return &d, nil
+}
+
+func EncodeDomain(d *Domain) (string, error) {
+	copy := *d
+
+	if copy.Tags == nil {
+		copy.Tags = []string{}
+	}
+
+	if copy.Relations == nil {
+		copy.Relations = []RelationRef{}
+	}
+
+	metadata, err := yaml.Marshal(&copy)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode domain: %w", err)
+	}
+
+	content := model.EncodeEntityFile(&model.EntityFile{
+		Metadata: string(metadata),
+		Body:     d.Body,
+	})
+
+	return content, nil
+}

@@ -3,11 +3,13 @@ package uri
 import (
 	"errors"
 	"fmt"
+
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type URI struct {
 	Raw     string
-	Entity  EntityType
+	Entity  string
 	Context *string
 	Domain  *string
 	Slug    string
@@ -55,7 +57,7 @@ func (uri *URI) ParentURI() (string, error) {
 		return "", errors.New("entity doesn't have a parent")
 	}
 
-	if uri.Entity == EntityTypeConcept {
+	if uri.Entity == model.EntityTypeConcept {
 		return fmt.Sprintf("scio://contexts/%s/domains/%s", *uri.Context, *uri.Domain), nil
 	}
 
