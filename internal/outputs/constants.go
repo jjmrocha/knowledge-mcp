@@ -1,0 +1,27 @@
+package outputs
+
+const (
+	ErrVersionConflict            = "VERSION_CONFLICT"
+	ErrValidationFailed           = "VALIDATION_FAILED"
+	ErrNotFound                   = "NOT_FOUND"
+	ErrAlreadyExists              = "ALREADY_EXISTS"
+	ErrImmutableField             = "IMMUTABLE_FIELD"
+	ErrParentNotFound             = "PARENT_NOT_FOUND"
+	ErrTagNotFound                = "TAG_NOT_FOUND"
+	ErrRelationTypeNotFound       = "RELATION_TYPE_NOT_FOUND"
+	ErrTargetNotFound             = "TARGET_NOT_FOUND"
+	ErrTypeMismatch               = "TYPE_MISMATCH"
+	ErrDuplicateTag               = "DUPLICATE_TAG"
+	ErrDuplicateRelation          = "DUPLICATE_RELATION"
+	ErrDuplicateSource            = "DUPLICATE_SOURCE"
+	ErrTagInUse                   = "TAG_IN_USE"
+	ErrRelationInUse              = "RELATION_IN_USE"
+	ErrInvalidURIFormat           = "INVALID_URI_FORMAT"
+	ErrInvalidSourceFormat        = "INVALID_SOURCE_FORMAT"
+	ErrSchemaUnsupported          = "SCHEMA_UNSUPPORTED"
+	ErrBatchValidationFailed      = "BATCH_VALIDATION_FAILED"
+	ErrScopeViolation             = "SCOPE_VIOLATION"
+	ErrTagCycle                   = "TAG_CYCLE"
+	ErrConfirmationRequired       = "CONFIRMATION_REQUIRED"
+	ErrRelationPropertiesConflict = "RELATION_PROPERTIES_CONFLICT"
+)

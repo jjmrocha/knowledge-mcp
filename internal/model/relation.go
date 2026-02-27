@@ -43,25 +43,25 @@ func ParseRelationType(content string) (*RelationType, error) {
 }
 
 func EncodeRelationType(r *RelationType) (string, error) {
-	copy := *r
+	entityCopy := *r
 
-	if copy.AllowedSourceEntities == nil {
-		copy.AllowedSourceEntities = []string{
+	if entityCopy.AllowedSourceEntities == nil {
+		entityCopy.AllowedSourceEntities = []string{
 			EntityTypeContext,
 			EntityTypeDomain,
 			EntityTypeConcept,
 		}
 	}
 
-	if copy.AllowedTargetEntities == nil {
-		copy.AllowedTargetEntities = []string{
+	if entityCopy.AllowedTargetEntities == nil {
+		entityCopy.AllowedTargetEntities = []string{
 			EntityTypeContext,
 			EntityTypeDomain,
 			EntityTypeConcept,
 		}
 	}
 
-	metadata, err := yaml.Marshal(&copy)
+	metadata, err := yaml.Marshal(&entityCopy)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode relation type: %w", err)
 	}

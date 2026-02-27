@@ -41,25 +41,25 @@ func ParseTag(content string) (*Tag, error) {
 }
 
 func EncodeTag(t *Tag) (string, error) {
-	copy := *t
+	entityCopy := *t
 
-	if copy.AllowedEntities == nil {
-		copy.AllowedEntities = []string{
+	if entityCopy.AllowedEntities == nil {
+		entityCopy.AllowedEntities = []string{
 			EntityTypeContext,
 			EntityTypeDomain,
 			EntityTypeConcept,
 		}
 	}
 
-	if copy.Broader == nil {
-		copy.Broader = []string{}
+	if entityCopy.Broader == nil {
+		entityCopy.Broader = []string{}
 	}
 
-	if copy.Narrower == nil {
-		copy.Narrower = []string{}
+	if entityCopy.Narrower == nil {
+		entityCopy.Narrower = []string{}
 	}
 
-	metadata, err := yaml.Marshal(&copy)
+	metadata, err := yaml.Marshal(&entityCopy)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode tag: %w", err)
 	}

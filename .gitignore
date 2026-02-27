@@ -33,3 +33,7 @@ go.work.sum
 
 # knowledge-mcp binary
 /knowledge-mcp
+
+# Claude Code
+/.serena
+CLAUDE.md

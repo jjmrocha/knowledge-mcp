@@ -42,21 +42,21 @@ func ParseConcept(content string) (*Concept, error) {
 }
 
 func EncodeConcept(c *Concept) (string, error) {
-	copy := *c
+	entityCopy := *c
 
-	if copy.Tags == nil {
-		copy.Tags = []string{}
+	if entityCopy.Tags == nil {
+		entityCopy.Tags = []string{}
 	}
 
-	if copy.Relations == nil {
-		copy.Relations = []RelationRef{}
+	if entityCopy.Relations == nil {
+		entityCopy.Relations = []RelationRef{}
 	}
 
-	if copy.Sources == nil {
-		copy.Sources = []Source{}
+	if entityCopy.Sources == nil {
+		entityCopy.Sources = []Source{}
 	}
 
-	metadata, err := yaml.Marshal(&copy)
+	metadata, err := yaml.Marshal(&entityCopy)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode concept: %w", err)
 	}

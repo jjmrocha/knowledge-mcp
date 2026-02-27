@@ -41,17 +41,17 @@ func ParseDomain(content string) (*Domain, error) {
 }
 
 func EncodeDomain(d *Domain) (string, error) {
-	copy := *d
+	entityCopy := *d
 
-	if copy.Tags == nil {
-		copy.Tags = []string{}
+	if entityCopy.Tags == nil {
+		entityCopy.Tags = []string{}
 	}
 
-	if copy.Relations == nil {
-		copy.Relations = []RelationRef{}
+	if entityCopy.Relations == nil {
+		entityCopy.Relations = []RelationRef{}
 	}
 
-	metadata, err := yaml.Marshal(&copy)
+	metadata, err := yaml.Marshal(&entityCopy)
 	if err != nil {
 		return "", fmt.Errorf("failed to encode domain: %w", err)
 	}
