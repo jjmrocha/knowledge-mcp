@@ -1,12 +1,11 @@
-package v1
+package model
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"gopkg.in/yaml.v3"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type Context struct {
@@ -23,21 +22,21 @@ type Context struct {
 }
 
 func ParseContext(content string) (*Context, error) {
-	entityFile, err := model.ParseEntityFile(content)
+	entityContent, err := entity.ParseContent(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse context file: %w", err)
 	}
 
 	var c Context
-	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &c); err != nil {
+	if err := yaml.Unmarshal([]byte(entityContent.Metadata), &c); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal context metadata: %w", err)
 	}
 
-	if c.Entity != model.EntityTypeContext {
-		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeContext, c.Entity)
+	if c.Entity != EntityTypeContext {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", EntityTypeContext, c.Entity)
 	}
 
-	c.Body = entityFile.Body
+	c.Body = entityContent.Body
 	return &c, nil
 }
 
@@ -57,7 +56,7 @@ func EncodeContext(c *Context) (string, error) {
 		return "", fmt.Errorf("failed to encode context: %w", err)
 	}
 
-	content := model.EncodeEntityFile(&model.EntityFile{
+	content := entity.Encode(&entity.EntityContent{
 		Metadata: string(metadata),
 		Body:     c.Body,
 	})

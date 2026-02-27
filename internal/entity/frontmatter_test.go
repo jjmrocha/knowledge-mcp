@@ -1,14 +1,13 @@
-package model_test
+package entity_test
 
 import (
 	"testing"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
-func TestParseEntityFile_ValidContent(t *testing.T) {
+func TestParseContent_ValidContent(t *testing.T) {
 	tests := []struct {
 		name             string
 		input            string
@@ -55,7 +54,7 @@ func TestParseEntityFile_ValidContent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := model.ParseEntityFile(tc.input)
+			result, err := entity.ParseContent(tc.input)
 			assert.NoError(t, err)
 			assert.NotNil(t, result)
 			assert.Equal(t, tc.expectedMetadata, result.Metadata)
@@ -64,7 +63,7 @@ func TestParseEntityFile_ValidContent(t *testing.T) {
 	}
 }
 
-func TestParseEntityFile_InvalidContent(t *testing.T) {
+func TestParseContent_InvalidContent(t *testing.T) {
 	tests := []struct {
 		name  string
 		input string
@@ -97,22 +96,22 @@ func TestParseEntityFile_InvalidContent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := model.ParseEntityFile(tc.input)
+			result, err := entity.ParseContent(tc.input)
 			assert.Error(t, err)
 			assert.Nil(t, result)
 		})
 	}
 }
 
-func TestEncodeEntityFile_ValidContent(t *testing.T) {
+func TestEncode_ValidContent(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    model.EntityFile
+		input    entity.EntityContent
 		expected string
 	}{
 		{
 			name: "metadata and body",
-			input: model.EntityFile{
+			input: entity.EntityContent{
 				Metadata: "entity: concept\nschema: 1",
 				Body:     "Body text.\n",
 			},
@@ -120,7 +119,7 @@ func TestEncodeEntityFile_ValidContent(t *testing.T) {
 		},
 		{
 			name: "empty metadata",
-			input: model.EntityFile{
+			input: entity.EntityContent{
 				Metadata: "",
 				Body:     "Body only.\n",
 			},
@@ -128,7 +127,7 @@ func TestEncodeEntityFile_ValidContent(t *testing.T) {
 		},
 		{
 			name: "empty body",
-			input: model.EntityFile{
+			input: entity.EntityContent{
 				Metadata: "entity: tag",
 				Body:     "",
 			},
@@ -136,7 +135,7 @@ func TestEncodeEntityFile_ValidContent(t *testing.T) {
 		},
 		{
 			name: "empty metadata and empty body",
-			input: model.EntityFile{
+			input: entity.EntityContent{
 				Metadata: "",
 				Body:     "",
 			},
@@ -146,15 +145,15 @@ func TestEncodeEntityFile_ValidContent(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result := model.EncodeEntityFile(&tc.input)
+			result := entity.Encode(&tc.input)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
 }
 
-func TestParseEntityFile_RoundTrip(t *testing.T) {
+func TestParseContent_RoundTrip(t *testing.T) {
 	// given
-	original := model.EntityFile{
+	original := entity.EntityContent{
 		Metadata: `entity: concept
 		schema: 1
 		uri: scio://contexts/ecommerce/domains/rules/concepts/discount
@@ -162,9 +161,9 @@ func TestParseEntityFile_RoundTrip(t *testing.T) {
 		Body: `Business logic for calculating tiered discounts based on order total.`,
 	}
 	// when
-	encoded := model.EncodeEntityFile(&original)
+	encoded := entity.Encode(&original)
 
-	parsed, err := model.ParseEntityFile(encoded)
+	parsed, err := entity.ParseContent(encoded)
 	// then
 	assert.NoError(t, err)
 	assert.NotNil(t, parsed)

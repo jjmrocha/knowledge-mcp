@@ -1,4 +1,4 @@
-package v1
+package model
 
 // RelationRef is a directed edge from a source entity to a target entity
 // via a named relation type.

@@ -1,14 +1,13 @@
-package v1_test
+package model_test
 
 import (
 	"strings"
 	"testing"
 	"time"
 
+	v1 "github.com/jjmrocha/knowledge-mcp/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	v1 "github.com/jjmrocha/knowledge-mcp/internal/model/v1"
 )
 
 // ---------------------------------------------------------------------------

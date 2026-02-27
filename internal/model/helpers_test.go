@@ -1,4 +1,4 @@
-package v1_test
+package model_test
 
 // entityContent wraps meta and body in YAML frontmatter delimiters,
 // producing a valid entity file string for use in tests.

@@ -1,14 +1,13 @@
-package v1_test
+package model_test
 
 import (
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	v1 "github.com/jjmrocha/knowledge-mcp/internal/model/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -30,7 +29,7 @@ relations: []`
 	content := entityContent(meta, "")
 
 	// when
-	d, err := v1.ParseDomain(content)
+	d, err := model.ParseDomain(content)
 
 	// then
 	require.NoError(t, err)
@@ -61,7 +60,7 @@ relations: []`
 	content := entityContent(meta, body)
 
 	// when
-	d, err := v1.ParseDomain(content)
+	d, err := model.ParseDomain(content)
 
 	// then
 	require.NoError(t, err)
@@ -84,7 +83,7 @@ relations:
 	content := entityContent(meta, "")
 
 	// when
-	d, err := v1.ParseDomain(content)
+	d, err := model.ParseDomain(content)
 
 	// then
 	require.NoError(t, err)
@@ -107,7 +106,7 @@ relations: []`
 	content := entityContent(meta, "")
 
 	// when
-	d, err := v1.ParseDomain(content)
+	d, err := model.ParseDomain(content)
 
 	// then
 	require.NoError(t, err)
@@ -131,7 +130,7 @@ func TestParseDomain_MissingFrontmatter(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			d, err := v1.ParseDomain(tc.input)
+			d, err := model.ParseDomain(tc.input)
 			assert.Error(t, err)
 			assert.Nil(t, d)
 			assert.ErrorContains(t, err, "failed to parse domain file")
@@ -144,7 +143,7 @@ func TestParseDomain_InvalidYAML(t *testing.T) {
 	content := entityContent("entity: [\nbad yaml", "")
 
 	// when
-	d, err := v1.ParseDomain(content)
+	d, err := model.ParseDomain(content)
 
 	// then
 	assert.Error(t, err)
@@ -168,7 +167,7 @@ func TestParseDomain_WrongEntityType(t *testing.T) {
 			meta := "entity: " + tc.entityType + "\nschema: 1\nuri: scio://contexts/x/domains/y\nname: Y\nversion: 1\ncreated: 2026-01-01T00:00:00Z\nlast-update: 2026-01-01T00:00:00Z\ntags: []\nrelations: []"
 			content := entityContent(meta, "")
 
-			d, err := v1.ParseDomain(content)
+			d, err := model.ParseDomain(content)
 
 			assert.Error(t, err)
 			assert.Nil(t, d)
@@ -184,7 +183,7 @@ func TestParseDomain_WrongEntityType(t *testing.T) {
 
 func TestEncodeDomain_NilTags_DefaultsToEmpty(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce/domains/business-rules",
@@ -193,11 +192,11 @@ func TestEncodeDomain_NilTags_DefaultsToEmpty(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       nil,
-		Relations:  []v1.RelationRef{},
+		Relations:  []model.RelationRef{},
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(d)
+	encoded, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -206,7 +205,7 @@ func TestEncodeDomain_NilTags_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeDomain_NilRelations_DefaultsToEmpty(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce/domains/business-rules",
@@ -219,7 +218,7 @@ func TestEncodeDomain_NilRelations_DefaultsToEmpty(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(d)
+	encoded, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -228,7 +227,7 @@ func TestEncodeDomain_NilRelations_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeDomain_DoesNotMutateOriginal(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y",
@@ -239,7 +238,7 @@ func TestEncodeDomain_DoesNotMutateOriginal(t *testing.T) {
 	}
 
 	// when
-	_, err := v1.EncodeDomain(d)
+	_, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -249,7 +248,7 @@ func TestEncodeDomain_DoesNotMutateOriginal(t *testing.T) {
 
 func TestEncodeDomain_ExplicitSlicesPreserved(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce/domains/business-rules",
@@ -258,13 +257,13 @@ func TestEncodeDomain_ExplicitSlicesPreserved(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/core"},
-		Relations: []v1.RelationRef{
+		Relations: []model.RelationRef{
 			{Type: "scio://relations/depends-on", Target: "scio://contexts/ecommerce/domains/products"},
 		},
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(d)
+	encoded, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -274,7 +273,7 @@ func TestEncodeDomain_ExplicitSlicesPreserved(t *testing.T) {
 
 func TestEncodeDomain_BodyIncluded(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y",
@@ -283,12 +282,12 @@ func TestEncodeDomain_BodyIncluded(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{},
-		Relations:  []v1.RelationRef{},
+		Relations:  []model.RelationRef{},
 		Body:       "Core business rules governing e-commerce operations.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(d)
+	encoded, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -297,7 +296,7 @@ func TestEncodeDomain_BodyIncluded(t *testing.T) {
 
 func TestEncodeDomain_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	// given
-	d := &v1.Domain{
+	d := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y",
@@ -308,7 +307,7 @@ func TestEncodeDomain_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(d)
+	encoded, err := model.EncodeDomain(d)
 
 	// then
 	require.NoError(t, err)
@@ -321,7 +320,7 @@ func TestEncodeDomain_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 
 func TestEncodeDomain_ParseDomain_RoundTrip(t *testing.T) {
 	// given
-	original := &v1.Domain{
+	original := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce/domains/business-rules",
@@ -330,17 +329,17 @@ func TestEncodeDomain_ParseDomain_RoundTrip(t *testing.T) {
 		Created:    time.Date(2026, 2, 15, 10, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 2, 19, 14, 30, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/core"},
-		Relations: []v1.RelationRef{
+		Relations: []model.RelationRef{
 			{Type: "scio://relations/depends-on", Target: "scio://contexts/ecommerce/domains/products"},
 		},
 		Body: "Core business rules.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(original)
+	encoded, err := model.EncodeDomain(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseDomain(encoded)
+	parsed, err := model.ParseDomain(encoded)
 
 	// then
 	require.NoError(t, err)
@@ -359,7 +358,7 @@ func TestEncodeDomain_ParseDomain_RoundTrip(t *testing.T) {
 
 func TestEncodeDomain_ParseDomain_NilSlicesRoundTrip(t *testing.T) {
 	// given
-	original := &v1.Domain{
+	original := &model.Domain{
 		Entity:     "domain",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y",
@@ -370,10 +369,10 @@ func TestEncodeDomain_ParseDomain_NilSlicesRoundTrip(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeDomain(original)
+	encoded, err := model.EncodeDomain(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseDomain(encoded)
+	parsed, err := model.ParseDomain(encoded)
 
 	// then
 	require.NoError(t, err)

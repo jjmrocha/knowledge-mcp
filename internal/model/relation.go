@@ -1,12 +1,11 @@
-package v1
+package model
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"gopkg.in/yaml.v3"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type RelationType struct {
@@ -25,21 +24,21 @@ type RelationType struct {
 }
 
 func ParseRelationType(content string) (*RelationType, error) {
-	entityFile, err := model.ParseEntityFile(content)
+	entityContent, err := entity.ParseContent(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse relation file: %w", err)
 	}
 
 	var r RelationType
-	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &r); err != nil {
+	if err := yaml.Unmarshal([]byte(entityContent.Metadata), &r); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal relation metadata: %w", err)
 	}
 
-	if r.Entity != model.EntityTypeRelation {
-		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeRelation, r.Entity)
+	if r.Entity != EntityTypeRelation {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", EntityTypeRelation, r.Entity)
 	}
 
-	r.Body = entityFile.Body
+	r.Body = entityContent.Body
 	return &r, nil
 }
 
@@ -48,17 +47,17 @@ func EncodeRelationType(r *RelationType) (string, error) {
 
 	if copy.AllowedSourceEntities == nil {
 		copy.AllowedSourceEntities = []string{
-			model.EntityTypeContext,
-			model.EntityTypeDomain,
-			model.EntityTypeConcept,
+			EntityTypeContext,
+			EntityTypeDomain,
+			EntityTypeConcept,
 		}
 	}
 
 	if copy.AllowedTargetEntities == nil {
 		copy.AllowedTargetEntities = []string{
-			model.EntityTypeContext,
-			model.EntityTypeDomain,
-			model.EntityTypeConcept,
+			EntityTypeContext,
+			EntityTypeDomain,
+			EntityTypeConcept,
 		}
 	}
 
@@ -67,7 +66,7 @@ func EncodeRelationType(r *RelationType) (string, error) {
 		return "", fmt.Errorf("failed to encode relation type: %w", err)
 	}
 
-	content := model.EncodeEntityFile(&model.EntityFile{
+	content := entity.Encode(&entity.EntityContent{
 		Metadata: string(metadata),
 		Body:     r.Body,
 	})

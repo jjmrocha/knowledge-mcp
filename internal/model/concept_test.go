@@ -1,14 +1,13 @@
-package v1_test
+package model_test
 
 import (
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	v1 "github.com/jjmrocha/knowledge-mcp/internal/model/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -36,7 +35,7 @@ sources:
 	content := entityContent(meta, "")
 
 	// when
-	c, err := v1.ParseConcept(content)
+	c, err := model.ParseConcept(content)
 
 	// then
 	require.NoError(t, err)
@@ -73,7 +72,7 @@ sources: []`
 	content := entityContent(meta, body)
 
 	// when
-	c, err := v1.ParseConcept(content)
+	c, err := model.ParseConcept(content)
 
 	// then
 	require.NoError(t, err)
@@ -95,7 +94,7 @@ sources: []`
 	content := entityContent(meta, "")
 
 	// when
-	c, err := v1.ParseConcept(content)
+	c, err := model.ParseConcept(content)
 
 	// then
 	require.NoError(t, err)
@@ -123,7 +122,7 @@ sources:
 	content := entityContent(meta, "")
 
 	// when
-	c, err := v1.ParseConcept(content)
+	c, err := model.ParseConcept(content)
 
 	// then
 	require.NoError(t, err)
@@ -150,7 +149,7 @@ func TestParseConcept_MissingFrontmatter(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			c, err := v1.ParseConcept(tc.input)
+			c, err := model.ParseConcept(tc.input)
 			assert.Error(t, err)
 			assert.Nil(t, c)
 			assert.ErrorContains(t, err, "failed to parse concept file")
@@ -163,7 +162,7 @@ func TestParseConcept_InvalidYAML(t *testing.T) {
 	content := entityContent("entity: [\nbad yaml", "")
 
 	// when
-	c, err := v1.ParseConcept(content)
+	c, err := model.ParseConcept(content)
 
 	// then
 	assert.Error(t, err)
@@ -187,7 +186,7 @@ func TestParseConcept_WrongEntityType(t *testing.T) {
 			meta := "entity: " + tc.entityType + "\nschema: 1\nuri: scio://contexts/x/domains/y/concepts/z\nname: Z\nversion: 1\ncreated: 2026-01-01T00:00:00Z\nlast-update: 2026-01-01T00:00:00Z\ntags: []\nrelations: []\nsources: []"
 			content := entityContent(meta, "")
 
-			c, err := v1.ParseConcept(content)
+			c, err := model.ParseConcept(content)
 
 			assert.Error(t, err)
 			assert.Nil(t, c)
@@ -203,7 +202,7 @@ func TestParseConcept_WrongEntityType(t *testing.T) {
 
 func TestEncodeConcept_NilTags_DefaultsToEmpty(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -212,12 +211,12 @@ func TestEncodeConcept_NilTags_DefaultsToEmpty(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       nil,
-		Relations:  []v1.RelationRef{},
-		Sources:    []v1.Source{},
+		Relations:  []model.RelationRef{},
+		Sources:    []model.Source{},
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -226,7 +225,7 @@ func TestEncodeConcept_NilTags_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeConcept_NilRelations_DefaultsToEmpty(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -236,11 +235,11 @@ func TestEncodeConcept_NilRelations_DefaultsToEmpty(t *testing.T) {
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{},
 		Relations:  nil,
-		Sources:    []v1.Source{},
+		Sources:    []model.Source{},
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -249,7 +248,7 @@ func TestEncodeConcept_NilRelations_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeConcept_NilSources_DefaultsToEmpty(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -258,12 +257,12 @@ func TestEncodeConcept_NilSources_DefaultsToEmpty(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{},
-		Relations:  []v1.RelationRef{},
+		Relations:  []model.RelationRef{},
 		Sources:    nil,
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -272,7 +271,7 @@ func TestEncodeConcept_NilSources_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeConcept_DoesNotMutateOriginal(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -284,7 +283,7 @@ func TestEncodeConcept_DoesNotMutateOriginal(t *testing.T) {
 	}
 
 	// when
-	_, err := v1.EncodeConcept(c)
+	_, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -295,7 +294,7 @@ func TestEncodeConcept_DoesNotMutateOriginal(t *testing.T) {
 
 func TestEncodeConcept_ExplicitSlicesPreserved(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -304,12 +303,12 @@ func TestEncodeConcept_ExplicitSlicesPreserved(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/business-rule"},
-		Relations:  []v1.RelationRef{{Type: "scio://relations/implements", Target: "scio://contexts/x/domains/y/concepts/policy"}},
-		Sources:    []v1.Source{{Type: "file", Href: "src/discount.go"}},
+		Relations:  []model.RelationRef{{Type: "scio://relations/implements", Target: "scio://contexts/x/domains/y/concepts/policy"}},
+		Sources:    []model.Source{{Type: "file", Href: "src/discount.go"}},
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -320,7 +319,7 @@ func TestEncodeConcept_ExplicitSlicesPreserved(t *testing.T) {
 
 func TestEncodeConcept_BodyIncluded(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -329,13 +328,13 @@ func TestEncodeConcept_BodyIncluded(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{},
-		Relations:  []v1.RelationRef{},
-		Sources:    []v1.Source{},
+		Relations:  []model.RelationRef{},
+		Sources:    []model.Source{},
 		Body:       "Business logic for calculating tiered discounts.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -344,7 +343,7 @@ func TestEncodeConcept_BodyIncluded(t *testing.T) {
 
 func TestEncodeConcept_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	// given
-	c := &v1.Concept{
+	c := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -355,7 +354,7 @@ func TestEncodeConcept_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(c)
+	encoded, err := model.EncodeConcept(c)
 
 	// then
 	require.NoError(t, err)
@@ -368,7 +367,7 @@ func TestEncodeConcept_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 
 func TestEncodeConcept_ParseConcept_RoundTrip(t *testing.T) {
 	// given
-	original := &v1.Concept{
+	original := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce/domains/business-rules/concepts/discount-calculation",
@@ -377,20 +376,20 @@ func TestEncodeConcept_ParseConcept_RoundTrip(t *testing.T) {
 		Created:    time.Date(2026, 2, 15, 10, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 2, 19, 14, 30, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/business-rule", "scio://tags/pricing"},
-		Relations: []v1.RelationRef{
+		Relations: []model.RelationRef{
 			{Type: "scio://relations/implements", Target: "scio://contexts/ecommerce/domains/policies/concepts/pricing-policy"},
 		},
-		Sources: []v1.Source{
+		Sources: []model.Source{
 			{Type: "file", Href: "src/pricing/discount.go"},
 		},
 		Body: "Business logic for calculating tiered discounts based on order total.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(original)
+	encoded, err := model.EncodeConcept(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseConcept(encoded)
+	parsed, err := model.ParseConcept(encoded)
 
 	// then
 	require.NoError(t, err)
@@ -410,7 +409,7 @@ func TestEncodeConcept_ParseConcept_RoundTrip(t *testing.T) {
 
 func TestEncodeConcept_ParseConcept_NilSlicesRoundTrip(t *testing.T) {
 	// given
-	original := &v1.Concept{
+	original := &model.Concept{
 		Entity:     "concept",
 		Schema:     1,
 		URI:        "scio://contexts/x/domains/y/concepts/z",
@@ -422,10 +421,10 @@ func TestEncodeConcept_ParseConcept_NilSlicesRoundTrip(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeConcept(original)
+	encoded, err := model.EncodeConcept(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseConcept(encoded)
+	parsed, err := model.ParseConcept(encoded)
 
 	// then
 	require.NoError(t, err)

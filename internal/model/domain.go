@@ -1,12 +1,11 @@
-package v1
+package model
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"gopkg.in/yaml.v3"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type Domain struct {
@@ -23,21 +22,21 @@ type Domain struct {
 }
 
 func ParseDomain(content string) (*Domain, error) {
-	entityFile, err := model.ParseEntityFile(content)
+	entityContent, err := entity.ParseContent(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse domain file: %w", err)
 	}
 
 	var d Domain
-	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &d); err != nil {
+	if err := yaml.Unmarshal([]byte(entityContent.Metadata), &d); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal domain metadata: %w", err)
 	}
 
-	if d.Entity != model.EntityTypeDomain {
-		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeDomain, d.Entity)
+	if d.Entity != EntityTypeDomain {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", EntityTypeDomain, d.Entity)
 	}
 
-	d.Body = entityFile.Body
+	d.Body = entityContent.Body
 	return &d, nil
 }
 
@@ -57,7 +56,7 @@ func EncodeDomain(d *Domain) (string, error) {
 		return "", fmt.Errorf("failed to encode domain: %w", err)
 	}
 
-	content := model.EncodeEntityFile(&model.EntityFile{
+	content := entity.Encode(&entity.EntityContent{
 		Metadata: string(metadata),
 		Body:     d.Body,
 	})

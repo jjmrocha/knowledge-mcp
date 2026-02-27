@@ -1,14 +1,13 @@
-package v1_test
+package model_test
 
 import (
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	v1 "github.com/jjmrocha/knowledge-mcp/internal/model/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -30,7 +29,7 @@ relations: []`
 	content := entityContent(meta, "")
 
 	// when
-	ctx, err := v1.ParseContext(content)
+	ctx, err := model.ParseContext(content)
 
 	// then
 	require.NoError(t, err)
@@ -61,7 +60,7 @@ relations: []`
 	content := entityContent(meta, body)
 
 	// when
-	ctx, err := v1.ParseContext(content)
+	ctx, err := model.ParseContext(content)
 
 	// then
 	require.NoError(t, err)
@@ -84,7 +83,7 @@ relations:
 	content := entityContent(meta, "")
 
 	// when
-	ctx, err := v1.ParseContext(content)
+	ctx, err := model.ParseContext(content)
 
 	// then
 	require.NoError(t, err)
@@ -107,7 +106,7 @@ relations: []`
 	content := entityContent(meta, "")
 
 	// when
-	ctx, err := v1.ParseContext(content)
+	ctx, err := model.ParseContext(content)
 
 	// then
 	require.NoError(t, err)
@@ -131,7 +130,7 @@ func TestParseContext_MissingFrontmatter(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			ctx, err := v1.ParseContext(tc.input)
+			ctx, err := model.ParseContext(tc.input)
 			assert.Error(t, err)
 			assert.Nil(t, ctx)
 			assert.ErrorContains(t, err, "failed to parse context file")
@@ -144,7 +143,7 @@ func TestParseContext_InvalidYAML(t *testing.T) {
 	content := entityContent("entity: [\nbad yaml", "")
 
 	// when
-	ctx, err := v1.ParseContext(content)
+	ctx, err := model.ParseContext(content)
 
 	// then
 	assert.Error(t, err)
@@ -168,7 +167,7 @@ func TestParseContext_WrongEntityType(t *testing.T) {
 			meta := "entity: " + tc.entityType + "\nschema: 1\nuri: scio://contexts/x\nname: X\nversion: 1\ncreated: 2026-01-01T00:00:00Z\nlast-update: 2026-01-01T00:00:00Z\ntags: []\nrelations: []"
 			content := entityContent(meta, "")
 
-			ctx, err := v1.ParseContext(content)
+			ctx, err := model.ParseContext(content)
 
 			assert.Error(t, err)
 			assert.Nil(t, ctx)
@@ -184,7 +183,7 @@ func TestParseContext_WrongEntityType(t *testing.T) {
 
 func TestEncodeContext_NilTags_DefaultsToEmpty(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce",
@@ -193,11 +192,11 @@ func TestEncodeContext_NilTags_DefaultsToEmpty(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       nil,
-		Relations:  []v1.RelationRef{},
+		Relations:  []model.RelationRef{},
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(ctx)
+	encoded, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -206,7 +205,7 @@ func TestEncodeContext_NilTags_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeContext_NilRelations_DefaultsToEmpty(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce",
@@ -219,7 +218,7 @@ func TestEncodeContext_NilRelations_DefaultsToEmpty(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(ctx)
+	encoded, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -228,7 +227,7 @@ func TestEncodeContext_NilRelations_DefaultsToEmpty(t *testing.T) {
 
 func TestEncodeContext_DoesNotMutateOriginal(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/x",
@@ -240,7 +239,7 @@ func TestEncodeContext_DoesNotMutateOriginal(t *testing.T) {
 	}
 
 	// when
-	_, err := v1.EncodeContext(ctx)
+	_, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -250,7 +249,7 @@ func TestEncodeContext_DoesNotMutateOriginal(t *testing.T) {
 
 func TestEncodeContext_ExplicitSlicesPreserved(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce",
@@ -259,13 +258,13 @@ func TestEncodeContext_ExplicitSlicesPreserved(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/business-rule"},
-		Relations: []v1.RelationRef{
+		Relations: []model.RelationRef{
 			{Type: "scio://relations/depends-on", Target: "scio://contexts/payment"},
 		},
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(ctx)
+	encoded, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -276,7 +275,7 @@ func TestEncodeContext_ExplicitSlicesPreserved(t *testing.T) {
 
 func TestEncodeContext_BodyIncluded(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/x",
@@ -285,12 +284,12 @@ func TestEncodeContext_BodyIncluded(t *testing.T) {
 		Created:    time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
 		Tags:       []string{},
-		Relations:  []v1.RelationRef{},
+		Relations:  []model.RelationRef{},
 		Body:       "Top-level knowledge area.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(ctx)
+	encoded, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -299,7 +298,7 @@ func TestEncodeContext_BodyIncluded(t *testing.T) {
 
 func TestEncodeContext_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	// given
-	ctx := &v1.Context{
+	ctx := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/x",
@@ -310,7 +309,7 @@ func TestEncodeContext_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(ctx)
+	encoded, err := model.EncodeContext(ctx)
 
 	// then
 	require.NoError(t, err)
@@ -323,7 +322,7 @@ func TestEncodeContext_OutputStartsWithFrontmatterDelimiter(t *testing.T) {
 
 func TestEncodeContext_ParseContext_RoundTrip(t *testing.T) {
 	// given
-	original := &v1.Context{
+	original := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/ecommerce",
@@ -332,17 +331,17 @@ func TestEncodeContext_ParseContext_RoundTrip(t *testing.T) {
 		Created:    time.Date(2026, 2, 15, 10, 0, 0, 0, time.UTC),
 		LastUpdate: time.Date(2026, 2, 19, 14, 30, 0, 0, time.UTC),
 		Tags:       []string{"scio://tags/business-rule"},
-		Relations: []v1.RelationRef{
+		Relations: []model.RelationRef{
 			{Type: "scio://relations/depends-on", Target: "scio://contexts/payment"},
 		},
 		Body: "Top-level e-commerce knowledge area.\n",
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(original)
+	encoded, err := model.EncodeContext(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseContext(encoded)
+	parsed, err := model.ParseContext(encoded)
 
 	// then
 	require.NoError(t, err)
@@ -361,7 +360,7 @@ func TestEncodeContext_ParseContext_RoundTrip(t *testing.T) {
 
 func TestEncodeContext_ParseContext_NilSlicesRoundTrip(t *testing.T) {
 	// given — nil slices trigger defaulting; verify the encoded defaults round-trip cleanly
-	original := &v1.Context{
+	original := &model.Context{
 		Entity:     "context",
 		Schema:     1,
 		URI:        "scio://contexts/x",
@@ -373,10 +372,10 @@ func TestEncodeContext_ParseContext_NilSlicesRoundTrip(t *testing.T) {
 	}
 
 	// when
-	encoded, err := v1.EncodeContext(original)
+	encoded, err := model.EncodeContext(original)
 	require.NoError(t, err)
 
-	parsed, err := v1.ParseContext(encoded)
+	parsed, err := model.ParseContext(encoded)
 
 	// then
 	require.NoError(t, err)

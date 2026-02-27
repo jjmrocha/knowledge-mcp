@@ -1,12 +1,11 @@
-package v1
+package model
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"gopkg.in/yaml.v3"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type Concept struct {
@@ -24,21 +23,21 @@ type Concept struct {
 }
 
 func ParseConcept(content string) (*Concept, error) {
-	entityFile, err := model.ParseEntityFile(content)
+	entityContent, err := entity.ParseContent(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse concept file: %w", err)
 	}
 
 	var c Concept
-	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &c); err != nil {
+	if err := yaml.Unmarshal([]byte(entityContent.Metadata), &c); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal concept metadata: %w", err)
 	}
 
-	if c.Entity != model.EntityTypeConcept {
-		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeConcept, c.Entity)
+	if c.Entity != EntityTypeConcept {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", EntityTypeConcept, c.Entity)
 	}
 
-	c.Body = entityFile.Body
+	c.Body = entityContent.Body
 	return &c, nil
 }
 
@@ -62,7 +61,7 @@ func EncodeConcept(c *Concept) (string, error) {
 		return "", fmt.Errorf("failed to encode concept: %w", err)
 	}
 
-	content := model.EncodeEntityFile(&model.EntityFile{
+	content := entity.Encode(&entity.EntityContent{
 		Metadata: string(metadata),
 		Body:     c.Body,
 	})

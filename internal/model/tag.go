@@ -1,12 +1,11 @@
-package v1
+package model
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/jjmrocha/knowledge-mcp/internal/entity"
 	"gopkg.in/yaml.v3"
-
-	"github.com/jjmrocha/knowledge-mcp/internal/model"
 )
 
 type Tag struct {
@@ -23,21 +22,21 @@ type Tag struct {
 }
 
 func ParseTag(content string) (*Tag, error) {
-	entityFile, err := model.ParseEntityFile(content)
+	entityContent, err := entity.ParseContent(content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse tag file: %w", err)
 	}
 
 	var t Tag
-	if err := yaml.Unmarshal([]byte(entityFile.Metadata), &t); err != nil {
+	if err := yaml.Unmarshal([]byte(entityContent.Metadata), &t); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal tag metadata: %w", err)
 	}
 
-	if t.Entity != model.EntityTypeTag {
-		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", model.EntityTypeTag, t.Entity)
+	if t.Entity != EntityTypeTag {
+		return nil, fmt.Errorf("invalid entity type: expected '%s', got '%s'", EntityTypeTag, t.Entity)
 	}
 
-	t.Body = entityFile.Body
+	t.Body = entityContent.Body
 	return &t, nil
 }
 
@@ -46,9 +45,9 @@ func EncodeTag(t *Tag) (string, error) {
 
 	if copy.AllowedEntities == nil {
 		copy.AllowedEntities = []string{
-			model.EntityTypeContext,
-			model.EntityTypeDomain,
-			model.EntityTypeConcept,
+			EntityTypeContext,
+			EntityTypeDomain,
+			EntityTypeConcept,
 		}
 	}
 
@@ -65,7 +64,7 @@ func EncodeTag(t *Tag) (string, error) {
 		return "", fmt.Errorf("failed to encode tag: %w", err)
 	}
 
-	content := model.EncodeEntityFile(&model.EntityFile{
+	content := entity.Encode(&entity.EntityContent{
 		Metadata: string(metadata),
 		Body:     t.Body,
 	})

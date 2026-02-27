@@ -1,17 +1,17 @@
-package model
+package entity
 
 import (
 	"errors"
 	"strings"
 )
 
-type EntityFile struct {
+type EntityContent struct {
 	Metadata string
 	Body     string
 }
 
-func ParseEntityFile(content string) (*EntityFile, error) {
-	var parsed EntityFile
+func ParseContent(content string) (*EntityContent, error) {
+	var parsed EntityContent
 
 	if !strings.HasPrefix(content, "---\n") {
 		return nil, errors.New("content does not start with YAML frontmatter delimiter")
@@ -30,7 +30,7 @@ func ParseEntityFile(content string) (*EntityFile, error) {
 	return &parsed, nil
 }
 
-func EncodeEntityFile(content *EntityFile) string {
+func Encode(content *EntityContent) string {
 	var builder strings.Builder
 
 	builder.WriteString("---\n")
